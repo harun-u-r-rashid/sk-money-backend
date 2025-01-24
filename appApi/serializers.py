@@ -6,7 +6,7 @@ from .models import Package, Partner
 class PackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Package
-        fields = ["user", "image", "title", "price", "description"]
+        fields = ["image", "title", "price", "description"]
 
 
 class PackageUpdateSerializer(serializers.ModelSerializer):

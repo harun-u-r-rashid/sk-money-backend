@@ -40,15 +40,15 @@ class PackageCreateView(generics.CreateAPIView):
     queryset = Package.objects.all()
 
     def create(self, request, *args, **kwargs):
-        profile = request.data["profile"]
+        # profile = request.data["profile"]
         title = request.data["title"]
         price = request.data["price"]
         description = request.data["description"]
 
-        owner = Profile.objects.filter(id=profile).first()
+        # owner = Profile.objects.filter(id=profile).first()
 
         package = Package()
-        package.profile = owner
+        # package.profile = owner
         package.title = title
         package.price = price
         package.description = description

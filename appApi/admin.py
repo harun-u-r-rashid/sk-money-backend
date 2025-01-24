@@ -6,7 +6,7 @@ from .models import Package,Partner
 
 
 class PackageAdmin(admin.ModelAdmin):
-    list_display = ["user", "id", "title"]
+    list_display = [ "id", "title"]
 
 
 # class DepositAdmin(admin.ModelAdmin):

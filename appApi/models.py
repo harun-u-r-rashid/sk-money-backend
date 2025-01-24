@@ -5,7 +5,7 @@ from .constants import STATUS
 
 
 class Package(models.Model):
-        user = models.ForeignKey(User, on_delete=models.CASCADE)
+        # user = models.ForeignKey(User, on_delete=models.CASCADE)
         title = models.CharField(unique=True, max_length=30)
         price = models.IntegerField(default=0)
         description = models.TextField(max_length=255)
