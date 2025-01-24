@@ -19,6 +19,12 @@ from .utils import send_code_to_activate_user_account
 
 
 
+# from rest_framework_simplejwt.views import TokenObtainPairView
+# from .serializers import MyTokenObtainPairSerializer
+
+# class MyTokenObtainPairView(TokenObtainPairView):
+#     serializer_class = MyTokenObtainPairSerializer
+
 # ========== User Registration =======
 class RegisterView(generics.CreateAPIView):
     queryset = User.objects.all()
@@ -104,8 +110,8 @@ class LogoutView(APIView):
 
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
-        serializer.data
-        return Response(status=status.HTTP_200_OK)
+        serializer.save()
+        return Response(status=status.HTTP_204_NO_CONTENT) 
 
 
 # =======User Search View=======#
@@ -123,4 +129,11 @@ class SearchUserView(generics.ListAPIView):
                 )  
             return Response({"message":"User doesn't exists."})
 
+
+# ========User Details======
+
+class UserDetailsView(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = serializers.UserSerializer
+    permission_classes = [AllowAny]
 

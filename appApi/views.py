@@ -3,16 +3,16 @@ from django.shortcuts import render
 from .serializers import (
     PackageSerializer,
     PackageUpdateSerializer,
-    DepositSerializer,
-    DepositHistorySerializer,
-    WithdrawHistorySerializer,
-    WithdrawSerializer,
-    DepositStatusUpdateSerializer,
-    WithdrawStatusUpdateSerializer,
+    # DepositSerializer,
+    # DepositHistorySerializer,
+    # WithdrawHistorySerializer,
+    # WithdrawSerializer,
+    # DepositStatusUpdateSerializer,
+    # WithdrawStatusUpdateSerializer,
     PartnerSerializer,
 )
-from .models import Package, Deposit, Withdraw, Partner
-from appAuth.models import User, Profile
+from .models import Package,  Partner
+from appAuth.models import User
 
 from rest_framework import generics
 from rest_framework.views import APIView
@@ -88,127 +88,127 @@ class PackageDeleteView(generics.DestroyAPIView):
         )
 
 
-# ======== View for Deposit ===========
+# # ======== View for Deposit ===========
 
 
-class DepositHistoryView(generics.ListAPIView):
-    queryset = Deposit.objects.all()
-    serializer_class = DepositHistorySerializer
-    permission_classes = [AllowAny]
+# class DepositHistoryView(generics.ListAPIView):
+#     queryset = Deposit.objects.all()
+#     serializer_class = DepositHistorySerializer
+#     permission_classes = [AllowAny]
 
 
-class DepositCreateView(generics.CreateAPIView):
-    serializer_class = DepositSerializer
-    permission_class = [AllowAny]
-    queryset = Deposit.objects.all()
+# class DepositCreateView(generics.CreateAPIView):
+#     serializer_class = DepositSerializer
+#     permission_class = [AllowAny]
+#     queryset = Deposit.objects.all()
 
-    def create(self, request, *args, **kwargs):
-        profile = request.data["profile"]
-        amount = request.data["amount"]
-        tran_id = request.data["tran_id"]
+#     def create(self, request, *args, **kwargs):
+#         profile = request.data["profile"]
+#         amount = request.data["amount"]
+#         tran_id = request.data["tran_id"]
 
-        owner = Profile.objects.filter(id=profile).first()
+#         owner = Profile.objects.filter(id=profile).first()
 
-        if amount < 500:
-            return Response(
-                {"message": "Minimum deposit amount 500 tk."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
+#         if amount < 500:
+#             return Response(
+#                 {"message": "Minimum deposit amount 500 tk."},
+#                 status=status.HTTP_400_BAD_REQUEST,
+#             )
 
-        deposit = Deposit()
-        deposit.profile = owner
-        deposit.amount = amount
-        deposit.tran_id = tran_id
-        deposit.save()
+#         deposit = Deposit()
+#         deposit.profile = owner
+#         deposit.amount = amount
+#         deposit.tran_id = tran_id
+#         deposit.save()
 
-        return Response(
-            {"message": "Deposited " f"{amount}" "tk. Wait for approval."},
-            status=status.HTTP_201_CREATED,
-        )
-
-
-class DepositStatusUpdateView(generics.UpdateAPIView):
-    serializer_class = DepositStatusUpdateSerializer
-    permission_classes = [AllowAny]
-    queryset = Deposit.objects.all()
-    look_field = "pk"
-
-    def perform_update(self, serializer):
-
-        deposit = self.get_object()
-        amount = deposit.amount
-        print(amount)
-        profile = deposit.profile
-        profile.balance += amount
-        print(profile.balance)
-        profile.save()
-        serializer.save()
-        return serializer.data
-        # return Response({"message": f"Approved the deposit of {profile}. {amount}tk added to {profile}'s account."})
+#         return Response(
+#             {"message": "Deposited " f"{amount}" "tk. Wait for approval."},
+#             status=status.HTTP_201_CREATED,
+#         )
 
 
-# ======== View for Withdraw ===========
+# class DepositStatusUpdateView(generics.UpdateAPIView):
+#     serializer_class = DepositStatusUpdateSerializer
+#     permission_classes = [AllowAny]
+#     queryset = Deposit.objects.all()
+#     look_field = "pk"
+
+#     def perform_update(self, serializer):
+
+#         deposit = self.get_object()
+#         amount = deposit.amount
+#         print(amount)
+#         profile = deposit.profile
+#         profile.balance += amount
+#         print(profile.balance)
+#         profile.save()
+#         serializer.save()
+#         return serializer.data
+#         # return Response({"message": f"Approved the deposit of {profile}. {amount}tk added to {profile}'s account."})
 
 
-class WithdrawHistoryView(generics.ListAPIView):
-    queryset = Withdraw.objects.all()
-    serializer_class = WithdrawHistorySerializer
-    permission_classes = [AllowAny]
+# # ======== View for Withdraw ===========
 
 
-class WithdrawCreateView(generics.CreateAPIView):
-    serializer_class = WithdrawSerializer
-    permission_class = [AllowAny]
-    queryset = Withdraw.objects.all()
-
-    def create(self, request, *args, **kwargs):
-        profile = request.data["profile"]
-        amount = request.data["amount"]
-        tran_id = request.data["tran_id"]
-
-        owner = Profile.objects.filter(id=profile).first()
-        # print(owner.balance)
-
-        if amount < 500:
-            return Response(
-                {"message": "Minimum withdraw amount 500 tk."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        if owner.balance < amount:
-            return Response(
-                {"message": "Insufficient balance."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        withdraw = Withdraw()
-        withdraw.profile = owner
-        withdraw.amount = amount
-        withdraw.tran_id = tran_id
-        withdraw.save()
-
-        return Response(
-            {"message": "Withdrawn " f"{amount}" "tk. Wait for approval"},
-            status=status.HTTP_201_CREATED,
-        )
+# class WithdrawHistoryView(generics.ListAPIView):
+#     queryset = Withdraw.objects.all()
+#     serializer_class = WithdrawHistorySerializer
+#     permission_classes = [AllowAny]
 
 
-class WithdrawStatusUpdateView(generics.UpdateAPIView):
-    serializer_class = WithdrawStatusUpdateSerializer
-    permission_classes = [AllowAny]
-    queryset = Withdraw.objects.all()
-    look_field = "pk"
+# class WithdrawCreateView(generics.CreateAPIView):
+#     serializer_class = WithdrawSerializer
+#     permission_class = [AllowAny]
+#     queryset = Withdraw.objects.all()
 
-    def perform_update(self, serializer):
+#     def create(self, request, *args, **kwargs):
+#         profile = request.data["profile"]
+#         amount = request.data["amount"]
+#         tran_id = request.data["tran_id"]
 
-        withdraw = self.get_object()
-        amount = withdraw.amount
-        print(amount)
-        profile = withdraw.profile
-        profile.balance -= amount
-        print(profile.balance)
-        profile.save()
-        serializer.save()
-        return serializer.data
+#         owner = Profile.objects.filter(id=profile).first()
+#         # print(owner.balance)
+
+#         if amount < 500:
+#             return Response(
+#                 {"message": "Minimum withdraw amount 500 tk."},
+#                 status=status.HTTP_400_BAD_REQUEST,
+#             )
+#         if owner.balance < amount:
+#             return Response(
+#                 {"message": "Insufficient balance."},
+#                 status=status.HTTP_400_BAD_REQUEST,
+#             )
+
+#         withdraw = Withdraw()
+#         withdraw.profile = owner
+#         withdraw.amount = amount
+#         withdraw.tran_id = tran_id
+#         withdraw.save()
+
+#         return Response(
+#             {"message": "Withdrawn " f"{amount}" "tk. Wait for approval"},
+#             status=status.HTTP_201_CREATED,
+#         )
+
+
+# class WithdrawStatusUpdateView(generics.UpdateAPIView):
+#     serializer_class = WithdrawStatusUpdateSerializer
+#     permission_classes = [AllowAny]
+#     queryset = Withdraw.objects.all()
+#     look_field = "pk"
+
+#     def perform_update(self, serializer):
+
+#         withdraw = self.get_object()
+#         amount = withdraw.amount
+#         print(amount)
+#         profile = withdraw.profile
+#         profile.balance -= amount
+#         print(profile.balance)
+#         profile.save()
+#         serializer.save()
+#         return serializer.data
 
 
 # ======== View for Partner ===========

@@ -6,25 +6,29 @@ from rest_framework_simplejwt.tokens import RefreshToken
 
 
 class AccountManager(BaseUserManager):
-    def create_user(self, username, full_name,  email, password=None):
+    def create_user(self, username, full_name,  email, password=None, image=None, balance=100):
         if not email:
             raise ValueError("User must have and email address")
         user = self.model(
             email = self.normalize_email(email),
             username = username,
             full_name=full_name,
+            image = image,
+            balance=balance
         )
 
         user.set_password(password)
         user.save(using=self._db)
         return user
     
-    def create_superuser(self, username, full_name, email, password):
+    def create_superuser(self, username, full_name, email, password, image=None, balance=100):
         user = self.create_user(
             email = self.normalize_email(email),
             username=username,
             full_name = full_name,
             password=password,
+            image=image,
+            balance=balance
         )
 
         user.is_active=True
@@ -41,6 +45,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     full_name = models.CharField( max_length=100)
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20)
+    balance = models.IntegerField(default=100)
+    image = models.ImageField(upload_to="user_image_folder", blank=True, null=True)
+    created_at= models.DateTimeField(auto_now_add=True)
+
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_admin = models.BooleanField(default=False)
@@ -68,14 +76,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     def has_module_perms(self, add_label):
         return True
 
-    def save(self, *args, **kwargs):
-        email_username, _ = self.email.split("@")
 
-        if self.full_name == "" or self.full_name == None:
-            self.full_name = email_username
-        if self.username == "" or self.username == None:
-            self.username = email_username
-        super(User, self).save(*args, **kwargs)
 
 
 class OneTimePassword(models.Model):
@@ -88,28 +89,28 @@ class OneTimePassword(models.Model):
 
 
     
-class Profile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    image = models.ImageField(
-        upload_to="user_folder",  null=True, blank=True
-    )
-    balance = models.IntegerField(default=100)
-    date = models.DateTimeField(auto_now_add=True)
+# class Profile(models.Model):
+#     user = models.OneToOneField(User, on_delete=models.CASCADE)
+#     image = models.ImageField(
+#         upload_to="user_folder",  null=True, blank=True
+#     )
+#     balance = models.IntegerField(default=100)
+#     date = models.DateTimeField(auto_now_add=True)
 
-    def __str__(self):
-        return str(self.user.full_name)
+#     def __str__(self):
+#         return str(self.user.full_name)
             
 
 
 
-def create_user_profile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user=instance)
+# def create_user_profile(sender, instance, created, **kwargs):
+#     if created:
+#         Profile.objects.create(user=instance)
 
 
-def save_user_profile(sender, instance, **kwargs):
-    instance.profile.save()
+# def save_user_profile(sender, instance, **kwargs):
+#     instance.profile.save()
 
 
-post_save.connect(create_user_profile, sender=User)
-post_save.connect(save_user_profile, sender=User)
+# post_save.connect(create_user_profile, sender=User)
+# post_save.connect(save_user_profile, sender=User)

@@ -1,8 +1,29 @@
 from rest_framework import serializers
-from appAuth.models import User, Profile
+from appAuth.models import User
 from django.contrib.auth import authenticate
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework_simplejwt.tokens import RefreshToken, TokenError
+
+
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+
+# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
+#     @classmethod
+#     def get_token(cls, user):
+#         token = super().get_token(user)
+
+#         # ✅ Add extra fields to JWT payload
+#         token["username"] = user.username
+#         token["email"] = user.email
+#         token["full_name"] = user.full_name
+#         token["phone"] = user.phone
+#         token["balance"] = user.balance
+#         token["is_active"] = user.is_active
+#         token["is_staff"] = user.is_staff
+#         token["is_admin"] = user.is_admin
+#         token["is_superadmin"] = user.is_superadmin
+
+#         return token
 
 
 class RegisterSerializer(serializers.ModelSerializer):
@@ -65,11 +86,9 @@ class LoginSerializer(serializers.ModelSerializer):
             raise AuthenticationFailed("Email is not active")
         tokens = user.tokens()
         return {
-            "username":user.username,
+
             "email": user.email,
             "full_name": user.full_name,
-            "is_active":user.is_active,
-            "is_admin":user.is_superuser,
             "access_token": str(tokens.get("access")),
             "refresh_token": str(tokens.get("refresh")),
         }
@@ -103,13 +122,18 @@ class UserSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
-class ProfileSerializer(serializers.ModelSerializer):
+class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Profile
-        fields = "__all__"
+        model = User
+        fields = ["full_name","image"]
+
+# class ProfileSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Profile
+#         fields = "__all__"
 
 
-class ProfileUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Profile
-        fields = ["image"]
+# class ProfileUpdateSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Profile
+#         fields = ["image"]
