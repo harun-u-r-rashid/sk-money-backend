@@ -16,7 +16,7 @@ urlpatterns = [
     # path("logout/", views.LogoutView.as_view()),
     # path("refresh/", TokenRefreshView.as_view()),
     path("user_search/", views.SearchUserView.as_view()),
-    path("user_details/<int:pk>/", views.UserDetailsView.as_view()),
+    path("user_details/<int:id>/", views.UserDetailsView.as_view()),
 ]
 
 

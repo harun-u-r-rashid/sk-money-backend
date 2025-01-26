@@ -1,5 +1,6 @@
 from rest_framework import serializers
-from .models import Package, Partner
+from .models import Package, Partner, SliderImage
+from . import models
 
 
 # ========Serializers for Package======#
@@ -15,25 +16,32 @@ class PackageUpdateSerializer(serializers.ModelSerializer):
         fields = ["title", "price", "description"]
 
 
+
+class SliderImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SliderImage
+        fields = ["image1", "image2", "image3"]
+
+        
 # # ========Serializers for Deposit ======#
 
 
-# class DepositHistorySerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Deposit
-#         fields = ["profile", "amount", "tran_id", "status"]
+class DepositHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Deposit
+        fields = ["id","user","amount", "tran_id", "status"]
 
 
-# class DepositSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Deposit
-#         fields = ["profile", "amount", "tran_id"]
+class DepositSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Deposit
+        fields = ["user", "amount", "tran_id"]
 
 
-# class DepositStatusUpdateSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Deposit
-#         fields = ["status"]
+class DepositStatusUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Deposit
+        fields = ["status"]
 
 
 # # ========Serializers for Deposit ======#

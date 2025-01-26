@@ -23,15 +23,30 @@ class Partner(models.Model):
         def __str__(self):
                 return f"{self.name}"
 
-# class Deposit(models.Model):
-#         profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-#         amount = models.IntegerField(default=0)
-#         tran_id = models.CharField(unique=True, max_length=100)
-#         status = models.CharField(max_length=30, choices=STATUS, default="PENDING")
+
+class SliderImage(models.Model):
+        image1 = models.ImageField(upload_to="slider_image_folder")
+        image2 = models.ImageField(upload_to="slider_image_folder")
+        image3 = models.ImageField(upload_to="slider_image_folder")
+
+
+        def __str__(self):
+                return f"{self.id}"
+        
         
 
-#         def __str__(self):
-#                 return f"{self.profile} ===== {self.amount}"
+
+class Deposit(models.Model):
+        user = models.ForeignKey(User, on_delete=models.CASCADE)
+        amount = models.IntegerField(default=0)
+        tran_id = models.CharField(unique=True, max_length=100)
+        status = models.CharField(max_length=30, choices=STATUS, default="PENDING")
+        created_at = models.DateTimeField(auto_now_add=True)
+        profit_start_date = models.DateField(null=True, blank=True)
+
+
+        def __str__(self):
+                return f"{self.user} ===== {self.amount}"
         
 
 

@@ -134,6 +134,11 @@ class SearchUserView(generics.ListAPIView):
 
 class UserDetailsView(generics.RetrieveAPIView):
     queryset = User.objects.all()
-    serializer_class = serializers.UserSerializer
+    serializer_class = serializers.UserDetailsSerializer
     permission_classes = [AllowAny]
+    lookup_field = "id"
+
+    def get_queryset(self):
+        user = self.kwargs.get('id')
+        return User.objects.filter(id=user)
 

@@ -63,20 +63,23 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "appAuth",
     "appApi",
+    "django_celery_beat",
 ]
 
 
 REST_FRAMEWORK = {
-    # YOUR SETTINGS
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_AUTHENTICATION_CLASSES": (
+    "DEFAULT_AUTHENTICATION_CLASSES": [
         "rest_framework_simplejwt.authentication.JWTAuthentication",
-    ),
+    ],
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.AllowAny",  # Or a more restrictive permission class
+    ],
 }
 
 
 SPECTACULAR_SETTINGS = {
-    "TITLE": "Django REST API",
+    "TITLE": "SK Money Saves REST API",
     # 'DESCRIPTION': 'Your project description',
     # 'VERSION': '1.0.0',
     # 'SERVE_INCLUDE_SCHEMA': False,
@@ -271,3 +274,24 @@ EMAIL_PORT = 587
 
 EMAIL_HOST_USER = env("EMAIL_HOST_USER")
 EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
+
+
+# ========Celery===========
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+CELERY_BROKER_URL = "redis://127.0.0.1:8000//0" 
+CELERY_RESULT_BACKEND = "redis://127.0.0.1:8000//0" 
+CELERY_RESULT_BACKEND = 'django-db'
+CELERY_TIMEZONE = "Asia/Dhaka"
+CELERY_RESULT_EXTENDED = True
+CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
+
+
+CELERY_BEAT_SCHEDULE = {
+    'add-daily-profit-every-minute': {
+        'task': 'backend.tasks.add_daily_profit',
+        'schedule': 60.0,  # 60 seconds = every minute
+    },
+}
+

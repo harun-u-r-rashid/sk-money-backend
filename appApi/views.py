@@ -1,17 +1,8 @@
 from django.shortcuts import render
+from django.utils.timezone import now
+from . import serializers
+from . import models
 
-from .serializers import (
-    PackageSerializer,
-    PackageUpdateSerializer,
-    # DepositSerializer,
-    # DepositHistorySerializer,
-    # WithdrawHistorySerializer,
-    # WithdrawSerializer,
-    # DepositStatusUpdateSerializer,
-    # WithdrawStatusUpdateSerializer,
-    PartnerSerializer,
-)
-from .models import Package,  Partner
 from appAuth.models import User
 
 from rest_framework import generics
@@ -29,15 +20,15 @@ from rest_framework.response import Response
 
 
 class PackageListView(generics.ListAPIView):
-    queryset = Package.objects.all()
-    serializer_class = PackageSerializer
+    queryset = models.Package.objects.all()
+    serializer_class = serializers.PackageSerializer
     permission_classes = [AllowAny]
 
 
 class PackageCreateView(generics.CreateAPIView):
-    serializer_class = PackageSerializer
+    serializer_class = serializers.PackageSerializer
     permission_class = [AllowAny]
-    queryset = Package.objects.all()
+    queryset = models.Package.objects.all()
 
     def create(self, request, *args, **kwargs):
         # profile = request.data["profile"]
@@ -47,7 +38,7 @@ class PackageCreateView(generics.CreateAPIView):
 
         # owner = Profile.objects.filter(id=profile).first()
 
-        package = Package()
+        package = models.Package()
         # package.profile = owner
         package.title = title
         package.price = price
@@ -60,91 +51,127 @@ class PackageCreateView(generics.CreateAPIView):
         )
 
 
-class PackageUpdateView(generics.UpdateAPIView):
-    serializer_class = PackageUpdateSerializer
+# class PackageUpdateView(generics.UpdateAPIView):
+#     serializer_class = PackageUpdateSerializer
+#     permission_classes = [AllowAny]
+#     queryset = Package.objects.all()
+#     look_field = "pk"
+
+#     def perform_update(self, serializer):
+#         serializer.save()
+#         return serializer.data
+
+
+# class PackageDeleteView(generics.DestroyAPIView):
+#     serializer_class = PackageSerializer
+#     permission_classes = [AllowAny]
+#     queryset = Package.objects.all()
+
+#     lookup_field = "pk"
+
+#     def destroy(self, request, *args, **kwargs):
+#         package = self.get_object()
+#         package.delete()
+
+#         return Response(
+#             {"message": "Project deleted successfully."},
+#             status=status.HTTP_204_NO_CONTENT,
+#         )
+
+
+# ==========Slider Image RetriveView ============
+
+
+class SliderImageView(generics.ListAPIView):
+    queryset = models.SliderImage.objects.all()
+    serializer_class = serializers.SliderImageSerializer
     permission_classes = [AllowAny]
-    queryset = Package.objects.all()
-    look_field = "pk"
-
-    def perform_update(self, serializer):
-        serializer.save()
-        return serializer.data
-
-
-class PackageDeleteView(generics.DestroyAPIView):
-    serializer_class = PackageSerializer
-    permission_classes = [AllowAny]
-    queryset = Package.objects.all()
-
-    lookup_field = "pk"
-
-    def destroy(self, request, *args, **kwargs):
-        package = self.get_object()
-        package.delete()
-
-        return Response(
-            {"message": "Project deleted successfully."},
-            status=status.HTTP_204_NO_CONTENT,
-        )
 
 
 # # ======== View for Deposit ===========
 
 
-# class DepositHistoryView(generics.ListAPIView):
-#     queryset = Deposit.objects.all()
-#     serializer_class = DepositHistorySerializer
-#     permission_classes = [AllowAny]
+class DepositHistoryView(generics.ListAPIView):
+    queryset = models.Deposit.objects.all()
+    serializer_class = serializers.DepositHistorySerializer
+    permission_classes = [IsAuthenticated]  # Ensure user is authenticated
+
+    def get_queryset(self):
+        user = self.request.user  # This will be the authenticated user
+        print("User", user)
+        return models.Deposit.objects.filter(user=user)
 
 
-# class DepositCreateView(generics.CreateAPIView):
-#     serializer_class = DepositSerializer
-#     permission_class = [AllowAny]
-#     queryset = Deposit.objects.all()
+class AllDepositHistoryView(generics.ListAPIView):
+    queryset = models.Deposit.objects.all()
+    serializer_class = serializers.DepositHistorySerializer
+    permission_classes = [IsAuthenticated]
 
-#     def create(self, request, *args, **kwargs):
-#         profile = request.data["profile"]
-#         amount = request.data["amount"]
-#         tran_id = request.data["tran_id"]
+    def get_queryset(self):
 
-#         owner = Profile.objects.filter(id=profile).first()
-
-#         if amount < 500:
-#             return Response(
-#                 {"message": "Minimum deposit amount 500 tk."},
-#                 status=status.HTTP_400_BAD_REQUEST,
-#             )
-
-#         deposit = Deposit()
-#         deposit.profile = owner
-#         deposit.amount = amount
-#         deposit.tran_id = tran_id
-#         deposit.save()
-
-#         return Response(
-#             {"message": "Deposited " f"{amount}" "tk. Wait for approval."},
-#             status=status.HTTP_201_CREATED,
-#         )
+        return models.Deposit.objects.filter(status="PENDING")
 
 
-# class DepositStatusUpdateView(generics.UpdateAPIView):
-#     serializer_class = DepositStatusUpdateSerializer
-#     permission_classes = [AllowAny]
-#     queryset = Deposit.objects.all()
-#     look_field = "pk"
+class DepositCreateView(generics.CreateAPIView):
+    serializer_class = serializers.DepositSerializer
+    permission_class = [AllowAny]
+    queryset = models.Deposit.objects.all()
 
-#     def perform_update(self, serializer):
+    def create(self, request, *args, **kwargs):
+        user = request.data["user"]
+        amount = request.data["amount"]
+        tran_id = request.data["tran_id"]
 
-#         deposit = self.get_object()
-#         amount = deposit.amount
-#         print(amount)
-#         profile = deposit.profile
-#         profile.balance += amount
-#         print(profile.balance)
-#         profile.save()
-#         serializer.save()
-#         return serializer.data
-#         # return Response({"message": f"Approved the deposit of {profile}. {amount}tk added to {profile}'s account."})
+        owner = models.User.objects.filter(id=user).first()
+        is_tran_id = models.Deposit.objects.filter(tran_id=tran_id)
+
+        if amount < 100:
+            return Response(
+                {"message": "Minimum deposit amount 100$."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if is_tran_id:
+            return Response(
+                {"message": "Transaction ID already exist."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        deposit = models.Deposit()
+        deposit.user = owner
+        deposit.amount = amount
+        deposit.tran_id = tran_id
+       
+        
+        deposit.save()
+
+        return Response(
+            {"message": "Deposited " f"{amount}" "tk. Wait for approval."},
+            status=status.HTTP_201_CREATED,
+        )
+
+
+class DepositStatusUpdateView(generics.UpdateAPIView):
+    serializer_class = serializers.DepositStatusUpdateSerializer
+    permission_classes = [AllowAny]
+    queryset = models.Deposit.objects.all()
+    look_field = "pk"
+
+    def perform_update(self, serializer):
+
+        deposit = self.get_object()
+        amount = deposit.amount
+
+        profit = (amount*0.01)
+        print(amount)
+        user = deposit.user
+        user.balance += amount
+        user.profit += profit
+        deposit.profit_start_date = now().date()
+        print(user.balance)
+        user.save()
+        serializer.save()
+        return serializer.data
 
 
 # # ======== View for Withdraw ===========
@@ -215,6 +242,6 @@ class PackageDeleteView(generics.DestroyAPIView):
 
 
 class PartnerListView(generics.ListAPIView):
-    queryset = Partner.objects.all()
-    serializer_class = PartnerSerializer
+    queryset = models.Partner.objects.all()
+    serializer_class = serializers.PartnerSerializer
     permission_classes = [AllowAny]

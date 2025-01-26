@@ -7,24 +7,6 @@ from rest_framework_simplejwt.tokens import RefreshToken, TokenError
 
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
-# class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
-#     @classmethod
-#     def get_token(cls, user):
-#         token = super().get_token(user)
-
-#         # ✅ Add extra fields to JWT payload
-#         token["username"] = user.username
-#         token["email"] = user.email
-#         token["full_name"] = user.full_name
-#         token["phone"] = user.phone
-#         token["balance"] = user.balance
-#         token["is_active"] = user.is_active
-#         token["is_staff"] = user.is_staff
-#         token["is_admin"] = user.is_admin
-#         token["is_superadmin"] = user.is_superadmin
-
-#         return token
-
 
 class RegisterSerializer(serializers.ModelSerializer):
     confirm_password = serializers.CharField(required=True)
@@ -36,6 +18,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             "full_name",
             "email",
             "phone",
+            "bkash_number",
             "password",
             "confirm_password",
         ]
@@ -45,17 +28,27 @@ class RegisterSerializer(serializers.ModelSerializer):
         full_name = self.validated_data["full_name"]
         email = self.validated_data["email"]
         phone = self.validated_data["phone"]
+        bkash_number = self.validated_data["bkash_number"]
 
         password = self.validated_data["password"]
         confirm_password = self.validated_data["confirm_password"]
 
         if password != confirm_password:
-            raise serializers.ValidationError({"error": "Password doesn't match"})
+            raise serializers.ValidationError("Password doesn't match.")
 
         if User.objects.filter(email=email).exists():
-            raise serializers.ValidationError({"error": "Email already exists"})
+            raise serializers.ValidationError("Account with this email already exists.")
 
-        user = User(email=email, full_name=full_name, username=username, phone=phone)
+        if User.objects.filter(username=username).exists():
+            raise serializers.ValidationError("Account with this username already exists.")
+
+        user = User(
+            email=email,
+            full_name=full_name,
+            username=username,
+            phone=phone,
+            bkash_number=bkash_number,
+        )
         user.set_password(password)
         user.is_active = False
         user.save()
@@ -64,6 +57,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
 
 class LoginSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(max_length=155, read_only=True)
     email = serializers.EmailField(max_length=155, min_length=6)
     password = serializers.CharField(max_length=68, write_only=True)
     full_name = serializers.CharField(max_length=255, read_only=True)
@@ -72,7 +66,14 @@ class LoginSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ["email", "password", "full_name", "access_token", "refresh_token"]
+        fields = [
+            "email",
+            "password",
+            "username",
+            "full_name",
+            "access_token",
+            "refresh_token",
+        ]
 
     def validate(self, attrs):
         email = attrs.get("email")
@@ -86,8 +87,8 @@ class LoginSerializer(serializers.ModelSerializer):
             raise AuthenticationFailed("Email is not active")
         tokens = user.tokens()
         return {
-
             "email": user.email,
+            "username": user.username,
             "full_name": user.full_name,
             "access_token": str(tokens.get("access")),
             "refresh_token": str(tokens.get("refresh")),
@@ -114,7 +115,7 @@ class LogoutSerializer(serializers.Serializer):
 
 class OTPCodeSerializer(serializers.Serializer):
     otp = serializers.CharField(max_length=10)
-    
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -122,10 +123,27 @@ class UserSerializer(serializers.ModelSerializer):
         fields = "__all__"
 
 
+class UserDetailsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "username",
+            "full_name",
+            "email",
+            "phone",
+            "bkash_number",
+            "balance",
+            "profit",
+            "is_active",
+            "is_superadmin",
+        ]
+
+
 class UserUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ["full_name","image"]
+        fields = ["full_name", "image"]
+
 
 # class ProfileSerializer(serializers.ModelSerializer):
 #     class Meta:
