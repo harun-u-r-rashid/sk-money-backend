@@ -7,15 +7,15 @@ from . import models
 
 
 class PackageAdmin(admin.ModelAdmin):
-    list_display = ["id", "title"]
+    list_display = ["title", "price"]
 
 
 class DepositAdmin(admin.ModelAdmin):
-    list_display = ["id", "status", "user", "tran_id", "amount"]
+    list_display = ["user", "status",  "tran_id", "amount"]
 
 
 class WithdrawAdmin(admin.ModelAdmin):
-    list_display = ["id", "status", "user", "amount"]
+    list_display = ["user", "status",  "amount"]
 
 
 admin.site.register(models.Package, PackageAdmin)

@@ -7,13 +7,13 @@ from . import models
 class PackageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Package
-        fields = ["image", "title", "price", "description"]
+        fields = ["image", "title", "price", "price_taka", "description"]
 
 
 class PackageUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Package
-        fields = ["title", "price", "description"]
+        fields = ["title", "price",  "description"]
 
 
 

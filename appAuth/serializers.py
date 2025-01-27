@@ -50,9 +50,7 @@ class RegisterSerializer(serializers.ModelSerializer):
             bkash_number=bkash_number,
         )
         user.set_password(password)
-        user.is_active = False
         user.save()
-
         return user
 
 

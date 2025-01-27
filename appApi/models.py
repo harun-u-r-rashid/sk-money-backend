@@ -8,6 +8,7 @@ class Package(models.Model):
         # user = models.ForeignKey(User, on_delete=models.CASCADE)
         title = models.CharField(unique=True, max_length=30)
         price = models.IntegerField(default=0)
+        price_taka = models.IntegerField(default=0)
         description = models.TextField(max_length=255)
         image = models.ImageField(upload_to="package_folder", blank=True, null=True)
 

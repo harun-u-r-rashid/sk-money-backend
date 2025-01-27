@@ -63,7 +63,6 @@ INSTALLED_APPS = [
     "drf_spectacular",
     "appAuth",
     "appApi",
-    "django_celery_beat",
 ]
 
 
@@ -258,40 +257,6 @@ SIMPLE_JWT = {
 }
 
 
-import environ
-
-env = environ.Env()
-environ.Env.read_env()
 
 
-EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
-
-EMAIL_HOST = "smtp.gmail.com"
-
-EMAIL_USE_TLS = True
-
-EMAIL_PORT = 587
-
-EMAIL_HOST_USER = env("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = env("EMAIL_HOST_PASSWORD")
-
-
-# ========Celery===========
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-
-CELERY_BROKER_URL = "redis://127.0.0.1:8000//0" 
-CELERY_RESULT_BACKEND = "redis://127.0.0.1:8000//0" 
-CELERY_RESULT_BACKEND = 'django-db'
-CELERY_TIMEZONE = "Asia/Dhaka"
-CELERY_RESULT_EXTENDED = True
-CELERY_BEAT_SCHEDULER = 'django_celery_beat.schedulers:DatabaseScheduler'
-
-
-CELERY_BEAT_SCHEDULE = {
-    'add-daily-profit-every-minute': {
-        'task': 'backend.tasks.add_daily_profit',
-        'schedule': 60.0,  # 60 seconds = every minute
-    },
-}
 
