@@ -176,6 +176,16 @@ class DepositStatusUpdateView(generics.UpdateAPIView):
 
 # # ======== View for Withdraw ===========
 
+class WithdrawtHistoryView(generics.ListAPIView):
+    queryset = models.Withdraw.objects.all()
+    serializer_class = serializers.WithdrawHistorySerializer
+    permission_classes = [IsAuthenticated]  # Ensure user is authenticated
+
+    def get_queryset(self):
+        user = self.request.user  # This will be the authenticated user
+        print("User", user)
+        return models.Withdraw.objects.filter(user=user)
+
 
 class AllWithdrawHistoryView(generics.ListAPIView):
     queryset = models.Withdraw.objects.all()
