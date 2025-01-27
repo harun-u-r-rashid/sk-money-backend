@@ -16,7 +16,7 @@ class AccountManager(BaseUserManager):
         email,
         password=None,
         image=None,
-        balance=100,
+        balance=0,
         profit=0,
     ):
         if not email:
@@ -35,7 +35,7 @@ class AccountManager(BaseUserManager):
         return user
 
     def create_superuser(
-        self, username, full_name, email, password, image=None, balance=100, profit=0
+        self, username, full_name, email, password, image=None, balance=0, profit=0
     ):
         user = self.create_user(
             email=self.normalize_email(email),

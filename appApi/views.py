@@ -114,7 +114,7 @@ class AllDepositHistoryView(generics.ListAPIView):
 
 class DepositCreateView(generics.CreateAPIView):
     serializer_class = serializers.DepositSerializer
-    permission_class = [AllowAny]
+    permission_class = [IsAuthenticated]
     queryset = models.Deposit.objects.all()
 
     def create(self, request, *args, **kwargs):
@@ -153,7 +153,7 @@ class DepositCreateView(generics.CreateAPIView):
 
 class DepositStatusUpdateView(generics.UpdateAPIView):
     serializer_class = serializers.DepositStatusUpdateSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     queryset = models.Deposit.objects.all()
     look_field = "pk"
 
@@ -180,7 +180,7 @@ class DepositStatusUpdateView(generics.UpdateAPIView):
 class AllWithdrawHistoryView(generics.ListAPIView):
     queryset = models.Withdraw.objects.all()
     serializer_class = serializers.WithdrawHistorySerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         return models.Withdraw.objects.filter(status="PENDING")
@@ -228,7 +228,7 @@ class WithdrawCreateView(generics.CreateAPIView):
 
 class WithdrawStatusUpdateView(generics.UpdateAPIView):
     serializer_class = serializers.WithdrawStatusUpdateSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
     queryset = models.Withdraw.objects.all()
     look_field = "pk"
 

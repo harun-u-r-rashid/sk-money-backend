@@ -43,7 +43,7 @@ class Deposit(models.Model):
         tran_id = models.CharField(unique=True, max_length=100)
         status = models.CharField(max_length=30, choices=STATUS, default="PENDING")
         created_at = models.DateTimeField(auto_now_add=True)
-        profit_start_date = models.DateField(null=True, blank=True)
+        profit_start_date = models.DateField(auto_now_add=True,null=True, blank=True)
 
 
         def __str__(self):
