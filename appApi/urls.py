@@ -5,7 +5,7 @@ from . import views
 
 urlpatterns = [
     #    Packages URL
-    path("list/", views.PackageListView.as_view()),
+    path("user_list/", views.PackageListView.as_view()),
     path("create/", views.PackageCreateView.as_view()),
     # path("update/<int:pk>/", views.PackageUpdateView.as_view()),
     # path("delete/<int:pk>/", views.PackageDeleteView.as_view()),
