@@ -17,12 +17,14 @@ def send_code_to_activate_user_account(email):
                 otp_code = generate_otp()
                 user = models.User.objects.get(email=email)
 
+                username = user.username
+
                 otp_object = models.OneTimePassword.objects.create(user=user, code = otp_code)
                 otp_object.save()
 
 
                 email_subject = "Please active your account."
-                email_body = render_to_string('otp_email.html', {'otp_code':otp_code})
+                email_body = render_to_string('otp_email.html', {'otp_code':otp_code, 'username':username})
 
                 email_message = EmailMultiAlternatives(email_subject,'', to=[user.email])
                 email_message.attach_alternative(email_body, 'text/html')

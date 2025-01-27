@@ -15,9 +15,9 @@ urlpatterns = [
     path("deposit_create/", views.DepositCreateView.as_view()),
     path("deposit_status_update/<int:pk>/", views.DepositStatusUpdateView.as_view()),
     # # Withdrawn URL
-    # path("withdraw_history/", views.WithdrawHistoryView.as_view()),
-    # path("withdraw_create/", views.WithdrawCreateView.as_view()),
-    # path("withdraw_status_update/<int:pk>/", views.WithdrawStatusUpdateView.as_view()),
+    path("withdraw_history/all/", views.AllWithdrawHistoryView.as_view()),
+    path("withdraw_create/", views.WithdrawCreateView.as_view()),
+    path("withdraw_status_update/<int:pk>/", views.WithdrawStatusUpdateView.as_view()),
     # # Partner URL
     path("partner_list/", views.PartnerListView.as_view()),
     # Image Slider

@@ -177,65 +177,72 @@ class DepositStatusUpdateView(generics.UpdateAPIView):
 # # ======== View for Withdraw ===========
 
 
-# class WithdrawHistoryView(generics.ListAPIView):
-#     queryset = Withdraw.objects.all()
-#     serializer_class = WithdrawHistorySerializer
-#     permission_classes = [AllowAny]
+class AllWithdrawHistoryView(generics.ListAPIView):
+    queryset = models.Withdraw.objects.all()
+    serializer_class = serializers.WithdrawHistorySerializer
+    permission_classes = [AllowAny]
+
+    def get_queryset(self):
+        return models.Withdraw.objects.filter(status="PENDING")
 
 
-# class WithdrawCreateView(generics.CreateAPIView):
-#     serializer_class = WithdrawSerializer
-#     permission_class = [AllowAny]
-#     queryset = Withdraw.objects.all()
+class WithdrawCreateView(generics.CreateAPIView):
+    serializer_class = serializers.WithdrawSerializer
+    permission_class = [AllowAny]
+    queryset = models.Withdraw.objects.all()
 
-#     def create(self, request, *args, **kwargs):
-#         profile = request.data["profile"]
-#         amount = request.data["amount"]
-#         tran_id = request.data["tran_id"]
+    def create(self, request, *args, **kwargs):
+        user = request.data["user"]
+        amount = request.data["amount"]
+        b_number = request.data["b_number"]
+        msg = request.data["msg"]
 
-#         owner = Profile.objects.filter(id=profile).first()
-#         # print(owner.balance)
+        owner = models.User.objects.filter(id=user).first()
 
-#         if amount < 500:
-#             return Response(
-#                 {"message": "Minimum withdraw amount 500 tk."},
-#                 status=status.HTTP_400_BAD_REQUEST,
-#             )
-#         if owner.balance < amount:
-#             return Response(
-#                 {"message": "Insufficient balance."},
-#                 status=status.HTTP_400_BAD_REQUEST,
-#             )
+        balance_profit = owner.balance + owner.profit
+        # print(owner.balance)
 
-#         withdraw = Withdraw()
-#         withdraw.profile = owner
-#         withdraw.amount = amount
-#         withdraw.tran_id = tran_id
-#         withdraw.save()
+        if amount < 100:
+            return Response(
+                {"message": "Minimum withdraw amount 100$."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if balance_profit < amount:
+            return Response(
+                {"message": "Insufficient balance."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
 
-#         return Response(
-#             {"message": "Withdrawn " f"{amount}" "tk. Wait for approval"},
-#             status=status.HTTP_201_CREATED,
-#         )
+        withdraw = models.Withdraw()
+        withdraw.user = owner
+        withdraw.amount = amount
+        withdraw.b_number = b_number
+        withdraw.msg = msg
+        withdraw.save()
+
+        return Response(
+            {"message": "Withdrawn " f"{amount}" "$. Wait for approval"},
+            status=status.HTTP_201_CREATED,
+        )
 
 
-# class WithdrawStatusUpdateView(generics.UpdateAPIView):
-#     serializer_class = WithdrawStatusUpdateSerializer
-#     permission_classes = [AllowAny]
-#     queryset = Withdraw.objects.all()
-#     look_field = "pk"
+class WithdrawStatusUpdateView(generics.UpdateAPIView):
+    serializer_class = serializers.WithdrawStatusUpdateSerializer
+    permission_classes = [AllowAny]
+    queryset = models.Withdraw.objects.all()
+    look_field = "pk"
 
-#     def perform_update(self, serializer):
+    def perform_update(self, serializer):
 
-#         withdraw = self.get_object()
-#         amount = withdraw.amount
-#         print(amount)
-#         profile = withdraw.profile
-#         profile.balance -= amount
-#         print(profile.balance)
-#         profile.save()
-#         serializer.save()
-#         return serializer.data
+        withdraw = self.get_object()
+        amount = withdraw.amount
+        print(amount)
+        user = withdraw.user
+        user.balance -= amount
+        print(user.balance)
+        user.save()
+        serializer.save()
+        return serializer.data
 
 
 # ======== View for Partner ===========

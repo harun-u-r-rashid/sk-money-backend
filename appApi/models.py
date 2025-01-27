@@ -50,13 +50,14 @@ class Deposit(models.Model):
         
 
 
-# class Withdraw(models.Model):
-#         profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
-#         amount = models.IntegerField(default=0)
-#         tran_id = models.CharField(unique=True, max_length=100)
-#         status = models.CharField(max_length=30, choices=STATUS, default="PENDING")
+class Withdraw(models.Model):
+        user = models.ForeignKey(User, on_delete=models.CASCADE)
+        amount = models.IntegerField(default=0)
+        b_number = models.CharField(max_length=20, blank=True, null=True)
+        msg = models.CharField(max_length=255)
+        status = models.CharField(max_length=30, choices=STATUS, default="PENDING")
         
 
-#         def __str__(self):
-#                 return f"{self.profile} ===== {self.amount}"
+        def __str__(self):
+                return f"{self.user} ===== {self.amount}"
 

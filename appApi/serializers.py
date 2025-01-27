@@ -45,22 +45,22 @@ class DepositStatusUpdateSerializer(serializers.ModelSerializer):
 
 
 # # ========Serializers for Deposit ======#
-# class WithdrawHistorySerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Deposit
-#         fields = ["profile", "amount", "tran_id", "status"]
+class WithdrawHistorySerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Withdraw
+        fields = ["id","user", "amount", "b_number", "status"]
 
 
-# class WithdrawSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Deposit
-#         fields = ["profile", "amount", "tran_id"]
+class WithdrawSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Withdraw
+        fields = ["user", "amount", "b_number", "msg"]
 
 
-# class WithdrawStatusUpdateSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Deposit
-#         fields = ["status"]
+class WithdrawStatusUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = models.Withdraw
+        fields = ["status"]
 
 
 # # ========== Serializer for Partner========
