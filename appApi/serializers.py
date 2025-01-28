@@ -13,8 +13,7 @@ class PackageSerializer(serializers.ModelSerializer):
 class PackageUpdateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Package
-        fields = ["title", "price",  "description"]
-
+        fields = ["title", "price", "description"]
 
 
 class SliderImageSerializer(serializers.ModelSerializer):
@@ -22,20 +21,20 @@ class SliderImageSerializer(serializers.ModelSerializer):
         model = SliderImage
         fields = ["image1", "image2", "image3"]
 
-        
+
 # # ========Serializers for Deposit ======#
 
 
 class DepositHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Deposit
-        fields = ["id","user","amount", "tran_id", "status"]
+        fields = ["id", "user", "amount", "transaction_id", "status"]
 
 
 class DepositSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Deposit
-        fields = ["user", "amount", "tran_id"]
+        fields = ["user", "package_name", "amount", "send_number", "transaction_id"]
 
 
 class DepositStatusUpdateSerializer(serializers.ModelSerializer):
@@ -48,13 +47,13 @@ class DepositStatusUpdateSerializer(serializers.ModelSerializer):
 class WithdrawHistorySerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Withdraw
-        fields = ["id","user", "amount", "b_number", "status"]
+        fields = ["id", "user", "amount", "bkash_number", "status"]
 
 
 class WithdrawSerializer(serializers.ModelSerializer):
     class Meta:
         model = models.Withdraw
-        fields = ["user", "amount", "b_number", "msg"]
+        fields = ["user", "amount", "bkash_number", "msg"]
 
 
 class WithdrawStatusUpdateSerializer(serializers.ModelSerializer):

@@ -62,7 +62,7 @@ class User(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     phone = models.CharField(max_length=20)
     bkash_number = models.CharField(max_length=20, default="01*********")
-    balance = models.IntegerField(default=100)
+    balance = models.IntegerField(default=0)
     profit = models.IntegerField(default=0)
     image = models.ImageField(upload_to="user_image_folder", blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)

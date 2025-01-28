@@ -39,11 +39,13 @@ class SliderImage(models.Model):
 
 class Deposit(models.Model):
         user = models.ForeignKey(User, on_delete=models.CASCADE)
+        package_name = models.CharField(max_length=100, default="Package Name")
         amount = models.IntegerField(default=0)
-        tran_id = models.CharField(unique=True, max_length=100)
+        send_number = models.CharField(max_length=20, default="***********")
+        transaction_id = models.CharField(unique=True, max_length=100)
         status = models.CharField(max_length=30, choices=STATUS, default="PENDING")
         created_at = models.DateTimeField(auto_now_add=True)
-        profit_start_date = models.DateField(auto_now_add=True,null=True, blank=True)
+        
 
 
         def __str__(self):
@@ -54,9 +56,11 @@ class Deposit(models.Model):
 class Withdraw(models.Model):
         user = models.ForeignKey(User, on_delete=models.CASCADE)
         amount = models.IntegerField(default=0)
-        b_number = models.CharField(max_length=20, blank=True, null=True)
+        bkash_number = models.CharField(max_length=20, blank=True, null=True)
         msg = models.CharField(max_length=255)
         status = models.CharField(max_length=30, choices=STATUS, default="PENDING")
+        created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
+
         
 
         def __str__(self):

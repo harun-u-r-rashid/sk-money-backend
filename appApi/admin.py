@@ -11,7 +11,7 @@ class PackageAdmin(admin.ModelAdmin):
 
 
 class DepositAdmin(admin.ModelAdmin):
-    list_display = ["user", "status",  "tran_id", "amount"]
+    list_display = ["user", "status","package_name",  "transaction_id", "amount", "send_number"]
 
 
 class WithdrawAdmin(admin.ModelAdmin):

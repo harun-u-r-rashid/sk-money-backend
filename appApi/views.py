@@ -25,30 +25,30 @@ class PackageListView(generics.ListAPIView):
     permission_classes = [AllowAny]
 
 
-class PackageCreateView(generics.CreateAPIView):
-    serializer_class = serializers.PackageSerializer
-    permission_class = [AllowAny]
-    queryset = models.Package.objects.all()
+# class PackageCreateView(generics.CreateAPIView):
+#     serializer_class = serializers.PackageSerializer
+#     permission_class = [AllowAny]
+#     queryset = models.Package.objects.all()
 
-    def create(self, request, *args, **kwargs):
-        # profile = request.data["profile"]
-        title = request.data["title"]
-        price = request.data["price"]
-        description = request.data["description"]
+#     def create(self, request, *args, **kwargs):
+#         # profile = request.data["profile"]
+#         title = request.data["title"]
+#         price = request.data["price"]
+#         description = request.data["description"]
 
-        # owner = Profile.objects.filter(id=profile).first()
+#         # owner = Profile.objects.filter(id=profile).first()
 
-        package = models.Package()
-        # package.profile = owner
-        package.title = title
-        package.price = price
-        package.description = description
+#         package = models.Package()
+#         # package.profile = owner
+#         package.title = title
+#         package.price = price
+#         package.description = description
 
-        package.save()
+#         package.save()
 
-        return Response(
-            {"message": "Package created successfully"}, status=status.HTTP_201_CREATED
-        )
+#         return Response(
+#             {"message": "Package created successfully"}, status=status.HTTP_201_CREATED
+#         )
 
 
 # class PackageUpdateView(generics.UpdateAPIView):
@@ -89,6 +89,48 @@ class SliderImageView(generics.ListAPIView):
 
 
 # # ======== View for Deposit ===========
+class DepositCreateView(generics.CreateAPIView):
+    serializer_class = serializers.DepositSerializer
+    permission_class = [IsAuthenticated]
+    queryset = models.Deposit.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        user = request.data["user"]
+        package_name = request.data["package_name"]
+        amount = request.data["amount"]
+        send_number = request.data["send_number"]
+        transaction_id = request.data["transaction_id"]
+
+    
+        owner = models.User.objects.filter(id=user).first()
+        is_transaction_id = models.Deposit.objects.filter(transaction_id=transaction_id)
+
+        if amount < 13000:
+            return Response(
+                {"message": "Minimum deposit amount 13000 tk."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        if is_transaction_id:
+            return Response(
+                {"message": "Transaction ID already exist."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        deposit = models.Deposit()
+        deposit.user = owner
+        deposit.package_name = package_name
+        deposit.send_number = send_number
+        deposit.amount = amount
+        deposit.transaction_id = transaction_id
+
+        deposit.save()
+
+        return Response(
+            {"message": "Deposited " f"{amount}" "tk. Wait for approval."},
+            status=status.HTTP_201_CREATED,
+        )
+
 
 
 class DepositHistoryView(generics.ListAPIView):
@@ -112,62 +154,18 @@ class AllDepositHistoryView(generics.ListAPIView):
         return models.Deposit.objects.filter(status="PENDING")
 
 
-class DepositCreateView(generics.CreateAPIView):
-    serializer_class = serializers.DepositSerializer
-    permission_class = [IsAuthenticated]
-    queryset = models.Deposit.objects.all()
-
-    def create(self, request, *args, **kwargs):
-        user = request.data["user"]
-        amount = request.data["amount"]
-        tran_id = request.data["tran_id"]
-
-        owner = models.User.objects.filter(id=user).first()
-        is_tran_id = models.Deposit.objects.filter(tran_id=tran_id)
-
-        if amount < 100:
-            return Response(
-                {"message": "Minimum deposit amount 100$."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        if is_tran_id:
-            return Response(
-                {"message": "Transaction ID already exist."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        deposit = models.Deposit()
-        deposit.user = owner
-        deposit.amount = amount
-        deposit.tran_id = tran_id
-       
-        
-        deposit.save()
-
-        return Response(
-            {"message": "Deposited " f"{amount}" "tk. Wait for approval."},
-            status=status.HTTP_201_CREATED,
-        )
-
 
 class DepositStatusUpdateView(generics.UpdateAPIView):
     serializer_class = serializers.DepositStatusUpdateSerializer
     permission_classes = [IsAuthenticated]
     queryset = models.Deposit.objects.all()
     look_field = "pk"
-
     def perform_update(self, serializer):
-
         deposit = self.get_object()
-        amount = deposit.amount
-
-        profit = (amount*0.01)
-        print(amount)
+        amount_taka = (deposit.amount/130)
+        print(amount_taka)
         user = deposit.user
-        user.balance += amount
-        user.profit += profit
-        deposit.profit_start_date = now().date()
+        user.balance += amount_taka
         print(user.balance)
         user.save()
         serializer.save()
@@ -175,6 +173,48 @@ class DepositStatusUpdateView(generics.UpdateAPIView):
 
 
 # # ======== View for Withdraw ===========
+class WithdrawCreateView(generics.CreateAPIView):
+    serializer_class = serializers.WithdrawSerializer
+    permission_class = [AllowAny]
+    queryset = models.Withdraw.objects.all()
+
+    def create(self, request, *args, **kwargs):
+        user = request.data["user"]
+        amount = request.data["amount"]
+        bkash_number = request.data["bkash_number"]
+        msg = request.data["msg"]
+
+        owner = models.User.objects.filter(id=user).first()
+
+        owner_balance = owner.balance*130
+
+        balance_profit = owner_balance + owner.profit
+        # print(owner.balance)
+
+        if amount < 13000:
+            return Response(
+                {"message": "Minimum withdraw amount 13000 tk."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+        if balance_profit < amount:
+            return Response(
+                {"message": "Insufficient balance."},
+                status=status.HTTP_400_BAD_REQUEST,
+            )
+
+        withdraw = models.Withdraw()
+        withdraw.user = owner
+        withdraw.amount = amount
+        withdraw.bkash_number = bkash_number
+        withdraw.msg = msg
+        withdraw.save()
+
+        return Response(
+            {"message": "Withdrawn " f"{amount}" "tk. Wait for approval"},
+            status=status.HTTP_201_CREATED,
+        )
+
+
 
 class WithdrawtHistoryView(generics.ListAPIView):
     queryset = models.Withdraw.objects.all()
@@ -196,44 +236,6 @@ class AllWithdrawHistoryView(generics.ListAPIView):
         return models.Withdraw.objects.filter(status="PENDING")
 
 
-class WithdrawCreateView(generics.CreateAPIView):
-    serializer_class = serializers.WithdrawSerializer
-    permission_class = [AllowAny]
-    queryset = models.Withdraw.objects.all()
-
-    def create(self, request, *args, **kwargs):
-        user = request.data["user"]
-        amount = request.data["amount"]
-        b_number = request.data["b_number"]
-        msg = request.data["msg"]
-
-        owner = models.User.objects.filter(id=user).first()
-
-        balance_profit = owner.balance + owner.profit
-        # print(owner.balance)
-
-        if amount < 100:
-            return Response(
-                {"message": "Minimum withdraw amount 100$."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-        if balance_profit < amount:
-            return Response(
-                {"message": "Insufficient balance."},
-                status=status.HTTP_400_BAD_REQUEST,
-            )
-
-        withdraw = models.Withdraw()
-        withdraw.user = owner
-        withdraw.amount = amount
-        withdraw.b_number = b_number
-        withdraw.msg = msg
-        withdraw.save()
-
-        return Response(
-            {"message": "Withdrawn " f"{amount}" "$. Wait for approval"},
-            status=status.HTTP_201_CREATED,
-        )
 
 
 class WithdrawStatusUpdateView(generics.UpdateAPIView):
