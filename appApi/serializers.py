@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from .models import Package, Partner, SliderImage
 from . import models
-
+from appAuth.serializers import UserDetailsSerializer
 
 # ========Serializers for Package======#
 class PackageSerializer(serializers.ModelSerializer):
@@ -26,6 +26,7 @@ class SliderImageSerializer(serializers.ModelSerializer):
 
 
 class DepositHistorySerializer(serializers.ModelSerializer):
+    user = UserDetailsSerializer(read_only=True)
     class Meta:
         model = models.Deposit
         fields = ["id", "user", "amount", "transaction_id", "status"]
@@ -45,6 +46,7 @@ class DepositStatusUpdateSerializer(serializers.ModelSerializer):
 
 # # ========Serializers for Deposit ======#
 class WithdrawHistorySerializer(serializers.ModelSerializer):
+    user = UserDetailsSerializer(read_only=True)
     class Meta:
         model = models.Withdraw
         fields = ["id", "user", "amount", "bkash_number", "status"]

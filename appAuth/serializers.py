@@ -111,8 +111,6 @@ class LogoutSerializer(serializers.Serializer):
             return self.fail("bad_token")
 
 
-class OTPCodeSerializer(serializers.Serializer):
-    otp = serializers.CharField(max_length=10)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -137,19 +135,3 @@ class UserDetailsSerializer(serializers.ModelSerializer):
         ]
 
 
-class UserUpdateSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User
-        fields = ["full_name", "image"]
-
-
-# class ProfileSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Profile
-#         fields = "__all__"
-
-
-# class ProfileUpdateSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Profile
-#         fields = ["image"]

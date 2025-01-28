@@ -44,7 +44,7 @@ class Deposit(models.Model):
         send_number = models.CharField(max_length=20, default="***********")
         transaction_id = models.CharField(unique=True, max_length=100)
         status = models.CharField(max_length=30, choices=STATUS, default="PENDING")
-        created_at = models.DateTimeField(auto_now_add=True)
+        created_at = models.DateTimeField(auto_now_add=True, null=True, blank=True)
         
 
 

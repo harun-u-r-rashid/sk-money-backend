@@ -16,12 +16,6 @@ from . import serializers
 from .models import User, OneTimePassword
 
 
-# from rest_framework_simplejwt.views import TokenObtainPairView
-# from .serializers import MyTokenObtainPairSerializer
-
-# class MyTokenObtainPairView(TokenObtainPairView):
-#     serializer_class = MyTokenObtainPairSerializer
-
 
 # ========== User Registration =======
 class RegisterView(generics.CreateAPIView):
